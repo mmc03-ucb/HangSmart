@@ -274,6 +274,15 @@ function PromptInput() {
             >
               {groupData?.name || 'Group'}
             </Typography>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                display: { xs: 'none', sm: 'block' },
+                mr: 2
+              }}
+            >
+              Group Code: <span style={{ fontWeight: 'bold' }}>{groupId}</span>
+            </Typography>
           </Toolbar>
         </AppBar>
 
@@ -349,7 +358,7 @@ function PromptInput() {
 
               {/* Special Requests */}
               <TextField
-                label="Any special requests or constraints?"
+                label="Any special requests?"
                 multiline
                 rows={2}
                 fullWidth
@@ -417,16 +426,6 @@ function PromptInput() {
                 </ListItem>
               ))}
             </List>
-
-            <Divider sx={{ my: 2 }} />
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-              <Typography variant="h6" color="primary" align="center">
-                Group Code: <span style={{ fontWeight: 'bold' }}>{groupId}</span>
-              </Typography>
-              <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 1 }}>
-                Share this code with friends to join the group
-              </Typography>
-            </Box>
           </Paper>
         </Container>
 
