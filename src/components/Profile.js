@@ -230,6 +230,17 @@ function Profile() {
             >
               <ArrowBackIcon />
             </IconButton>
+            <Box
+              component="img"
+              src="/images/logo.svg"
+              alt="HangSmart Logo"
+              sx={{ 
+                width: 36, 
+                height: 36,
+                mr: 1,
+                display: { xs: 'none', sm: 'block' }
+              }}
+            />
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
               Profile
             </Typography>

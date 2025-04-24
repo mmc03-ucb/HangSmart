@@ -15,7 +15,8 @@ import {
   useMediaQuery,
   useTheme,
   InputAdornment,
-  IconButton
+  IconButton,
+  GlobalStyles
 } from '@mui/material';
 import { 
   Google as GoogleIcon, 
@@ -96,6 +97,37 @@ const darkTheme = createTheme({
     },
   },
 });
+
+// CSS to prevent autofill blue background
+const globalStyles = (
+  <GlobalStyles 
+    styles={{
+      // For Chrome
+      'input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active': {
+        WebkitBoxShadow: '0 0 0 30px #1e1e1e inset !important',
+        WebkitTextFillColor: '#fff !important',
+        caretColor: '#fff !important',
+        transition: 'background-color 5000s ease-in-out 0s',
+      },
+      // For Firefox and others
+      'input.MuiInput-input, input.MuiOutlinedInput-input, input.MuiFilledInput-input': {
+        background: 'transparent !important',
+      },
+      '.MuiInputBase-root': {
+        background: 'transparent !important',
+      },
+      '.MuiOutlinedInput-notchedOutline': {
+        borderColor: 'rgba(255, 255, 255, 0.23)',
+      },
+      '.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: 'rgba(144, 202, 249, 0.5)',
+      },
+      '.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#90caf9',
+      },
+    }}
+  />
+);
 
 function SignInSignUp() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -202,6 +234,7 @@ function SignInSignUp() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
+      {globalStyles}
       <Box 
         sx={{ 
           minHeight: '100vh', 
@@ -215,6 +248,37 @@ function SignInSignUp() {
         }}
       >
         <Container maxWidth="sm">
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              mb: 3
+            }}
+          >
+            <Box
+              component="img"
+              src="/images/logo.svg"
+              alt="HangSmart Logo"
+              sx={{ 
+                width: { xs: 120, sm: 150 }, 
+                height: { xs: 120, sm: 150 },
+                mb: 2
+              }}
+            />
+            <Typography 
+              variant="h4" 
+              color="primary" 
+              sx={{ 
+                fontWeight: 'bold', 
+                textAlign: 'center',
+                textShadow: '0 2px 10px rgba(0,0,0,0.5)'
+              }}
+            >
+              HangSmart
+            </Typography>
+          </Box>
+          
           <Paper 
             elevation={6} 
             sx={{ 
@@ -225,6 +289,7 @@ function SignInSignUp() {
               mx: 'auto',
               border: '1px solid rgba(144, 202, 249, 0.2)',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              backgroundColor: '#1e1e1e'
             }}
           >
             <Typography 
@@ -257,6 +322,11 @@ function SignInSignUp() {
                   ),
                 }}
                 sx={{ mb: 2 }}
+                inputProps={{
+                  sx: {
+                    backgroundColor: 'transparent'
+                  }
+                }}
               />
             )}
             
@@ -273,6 +343,14 @@ function SignInSignUp() {
                     <EmailIcon color="primary" />
                   </InputAdornment>
                 ),
+                sx: {
+                  backgroundColor: 'transparent'
+                }
+              }}
+              inputProps={{
+                sx: {
+                  backgroundColor: 'transparent'
+                }
               }}
               sx={{ mb: 2 }}
             />
@@ -301,6 +379,14 @@ function SignInSignUp() {
                     </IconButton>
                   </InputAdornment>
                 ),
+                sx: {
+                  backgroundColor: 'transparent'
+                }
+              }}
+              inputProps={{
+                sx: {
+                  backgroundColor: 'transparent'
+                }
               }}
               sx={{ mb: 2 }}
             />
@@ -330,6 +416,14 @@ function SignInSignUp() {
                       </IconButton>
                     </InputAdornment>
                   ),
+                  sx: {
+                    backgroundColor: 'transparent'
+                  }
+                }}
+                inputProps={{
+                  sx: {
+                    backgroundColor: 'transparent'
+                  }
                 }}
                 sx={{ mb: 2 }}
               />

@@ -254,6 +254,17 @@ function Landing() {
       <Box sx={{ flexGrow: 1, minHeight: '100vh', pb: 4 }}>
         <AppBar position="static">
           <Toolbar sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+            <Box
+              component="img"
+              src="/images/logo.svg"
+              alt="HangSmart Logo"
+              sx={{ 
+                width: 40, 
+                height: 40,
+                mr: 1,
+                display: { xs: 'none', sm: 'block' }
+              }}
+            />
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
               HangSmart
             </Typography>
@@ -279,6 +290,19 @@ function Landing() {
         </AppBar>
 
         <Container maxWidth="md" sx={{ mt: { xs: 4, sm: 6, md: 8 }, mb: { xs: 2, sm: 3, md: 4 }, px: { xs: 2, sm: 3 } }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
+            <Box
+              component="img"
+              src="/images/logo.svg"
+              alt="HangSmart Logo"
+              sx={{ 
+                width: { xs: 120, sm: 150, md: 180 }, 
+                height: { xs: 120, sm: 150, md: 180 },
+                mb: 2
+              }}
+            />
+          </Box>
+        
           <Typography variant="h4" align="center" color="textPrimary" gutterBottom>
             Welcome, {userName ? userName : "User"}!
           </Typography>
