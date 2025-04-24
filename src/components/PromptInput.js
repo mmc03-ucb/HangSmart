@@ -15,7 +15,6 @@ import {
   IconButton,
   CssBaseline,
   CircularProgress,
-  useTheme,
   useMediaQuery,
   TextField,
   Button,
@@ -23,7 +22,6 @@ import {
   createTheme,
   Divider,
   Stack,
-  Tooltip,
   Snackbar,
   Alert
 } from '@mui/material';
@@ -113,7 +111,6 @@ function PromptInput() {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   
   const navigate = useNavigate();
-  const theme = useTheme();
   const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
 
   useEffect(() => {

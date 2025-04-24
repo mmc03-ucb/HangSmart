@@ -27,7 +27,7 @@ import {
 import { Logout as LogoutIcon, Person as PersonIcon, Add as AddIcon, Login as LoginIcon } from '@mui/icons-material';
 import { auth, db } from '../firebase/config';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 // Create a responsive dark theme

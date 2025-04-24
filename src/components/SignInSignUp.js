@@ -374,6 +374,7 @@ function SignInSignUp() {
                       aria-label="toggle password visibility"
                       onClick={handleClickShowPassword}
                       edge="end"
+                      size={isMobile ? "small" : "medium"}
                     >
                       {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                     </IconButton>
@@ -411,6 +412,7 @@ function SignInSignUp() {
                         aria-label="toggle confirm password visibility"
                         onClick={handleClickShowConfirmPassword}
                         edge="end"
+                        size={isMobile ? "small" : "medium"}
                       >
                         {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
