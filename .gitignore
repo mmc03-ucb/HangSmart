@@ -13,6 +13,7 @@
 
 # misc
 .DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -21,3 +22,62 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vscode/
+.idea/
+.DS_Store
+.env
+
+# Firebase
+firebase-debug.log
+firestore-debug.log
+
+# Build files
+dist/
+build/
+
+# Logs
+*.log
+logs/
+log/
+
+# Coverage
+coverage/
+*.lcov
+
+# Temp files
+tmp/
+temp/
+*.tmp
+*.swp
+
+# Cache
+.cache/
+.next/
+out/
+
+# MacOS specific files
+*.DS_Store
+
+# Generated files
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*
+firebase-debug.log
+
+# Miscellaneous
+*.lock
+public/static/
+*.bak
+*.old
+
+# Firebase Config (Sensitive Information)
+src/firebase/config.js
