@@ -41,8 +41,8 @@ const darkTheme = createTheme({
       main: '#f48fb1',
     },
     background: {
-      default: '#121212',
-      paper: '#1e1e1e',
+      default: 'linear-gradient(135deg, #2a1a5e 0%, #121212 100%)',
+      paper: 'rgba(30, 30, 46, 0.8)',
     },
   },
   typography: {
@@ -251,12 +251,18 @@ function Landing() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Box sx={{ flexGrow: 1, minHeight: '100vh', pb: 4 }}>
-        <AppBar position="static">
+      <Box sx={{ 
+        flexGrow: 1, 
+        minHeight: '100vh', 
+        pb: 4,
+        background: 'linear-gradient(135deg, #2a1a5e 0%, #121212 100%)',
+        backgroundAttachment: 'fixed'
+      }}>
+        <AppBar position="static" sx={{ background: 'rgba(30, 30, 46, 0.8)', backdropFilter: 'blur(10px)' }}>
           <Toolbar sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
             <Box
               component="img"
-              src="/images/logo.svg"
+              src="/images/logo.png"
               alt="HangSmart Logo"
               sx={{ 
                 width: 40, 
@@ -293,7 +299,7 @@ function Landing() {
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
             <Box
               component="img"
-              src="/images/logo.svg"
+              src="/images/logo.png"
               alt="HangSmart Logo"
               sx={{ 
                 width: { xs: 120, sm: 150, md: 180 }, 
@@ -431,7 +437,15 @@ function Landing() {
           </Grid>
         </Container>
 
-        <Dialog open={createGroupOpen} onClose={() => setCreateGroupOpen(false)}>
+        <Dialog open={createGroupOpen} onClose={() => setCreateGroupOpen(false)}
+          PaperProps={{
+            sx: {
+              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+              borderRadius: 2,
+              border: '1px solid rgba(144, 202, 249, 0.2)',
+            }
+          }}
+        >
           <DialogTitle>Create New Group</DialogTitle>
           <DialogContent>
             <TextField
@@ -452,7 +466,15 @@ function Landing() {
           </DialogActions>
         </Dialog>
 
-        <Dialog open={joinGroupOpen} onClose={() => setJoinGroupOpen(false)}>
+        <Dialog open={joinGroupOpen} onClose={() => setJoinGroupOpen(false)}
+          PaperProps={{
+            sx: {
+              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+              borderRadius: 2,
+              border: '1px solid rgba(144, 202, 249, 0.2)',
+            }
+          }}
+        >
           <DialogTitle>Join Group</DialogTitle>
           <DialogContent>
             <TextField

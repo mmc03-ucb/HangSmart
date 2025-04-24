@@ -45,8 +45,8 @@ const darkTheme = createTheme({
       main: '#f48fb1',
     },
     background: {
-      default: '#121212',
-      paper: '#1e1e1e',
+      default: 'linear-gradient(135deg, #2a1a5e 0%, #121212 100%)',
+      paper: 'rgba(30, 30, 46, 0.8)',
     },
   },
   typography: {
@@ -218,8 +218,14 @@ function Profile() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Box sx={{ flexGrow: 1, minHeight: '100vh', pb: 4 }}>
-        <AppBar position="static">
+      <Box sx={{ 
+        flexGrow: 1, 
+        minHeight: '100vh', 
+        pb: 4,
+        background: 'linear-gradient(135deg, #2a1a5e 0%, #121212 100%)',
+        backgroundAttachment: 'fixed'
+      }}>
+        <AppBar position="static" sx={{ background: 'rgba(30, 30, 46, 0.8)', backdropFilter: 'blur(10px)' }}>
           <Toolbar sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
             <IconButton
               color="inherit"
@@ -232,7 +238,7 @@ function Profile() {
             </IconButton>
             <Box
               component="img"
-              src="/images/logo.svg"
+              src="/images/logo.png"
               alt="HangSmart Logo"
               sx={{ 
                 width: 36, 
@@ -265,7 +271,9 @@ function Profile() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              border: '1px solid rgba(144, 202, 249, 0.2)'
+              border: '1px solid rgba(144, 202, 249, 0.2)',
+              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
             }}
           >
             <Avatar 
@@ -349,6 +357,13 @@ function Profile() {
           maxWidth="sm" 
           fullWidth
           fullScreen={isMobile}
+          PaperProps={{
+            sx: {
+              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+              borderRadius: 2,
+              border: '1px solid rgba(144, 202, 249, 0.2)',
+            }
+          }}
         >
           <DialogTitle sx={{ pt: { xs: 2, sm: 3 } }}>Confirm Profile Deletion</DialogTitle>
           <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>

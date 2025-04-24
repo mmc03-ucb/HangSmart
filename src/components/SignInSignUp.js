@@ -41,8 +41,8 @@ const darkTheme = createTheme({
       main: '#f48fb1',
     },
     background: {
-      default: '#121212',
-      paper: '#1e1e1e',
+      default: 'linear-gradient(135deg, #2a1a5e 0%, #121212 100%)',
+      paper: 'rgba(30, 30, 46, 0.8)',
     },
   },
   typography: {
@@ -102,16 +102,30 @@ const darkTheme = createTheme({
 const globalStyles = (
   <GlobalStyles 
     styles={{
-      // For Chrome
-      'input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active': {
-        WebkitBoxShadow: '0 0 0 30px #1e1e1e inset !important',
+      '@-webkit-keyframes autofill': {
+        '0%,100%': {
+          color: '#fff',
+          background: 'transparent',
+        },
+      },
+      'input:-webkit-autofill': {
+        WebkitAnimation: 'autofill 0s forwards',
+        animation: 'autofill 0s forwards',
         WebkitTextFillColor: '#fff !important',
+        WebkitBoxShadow: '0 0 0px 1000px rgba(25, 25, 40, 0.9) inset !important',
+        borderRadius: '0 4px 4px 0 !important',
         caretColor: '#fff !important',
-        transition: 'background-color 5000s ease-in-out 0s',
+      },
+      'input:-webkit-autofill:focus': {
+        WebkitTextFillColor: '#fff !important',
+        WebkitBoxShadow: '0 0 0px 1000px rgba(30, 30, 46, 0.9) inset !important',
+        borderRadius: '0 4px 4px 0 !important',
+        caretColor: '#fff !important',
       },
       // For Firefox and others
       'input.MuiInput-input, input.MuiOutlinedInput-input, input.MuiFilledInput-input': {
         background: 'transparent !important',
+        color: '#fff !important'
       },
       '.MuiInputBase-root': {
         background: 'transparent !important',
@@ -124,6 +138,26 @@ const globalStyles = (
       },
       '.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
         borderColor: '#90caf9',
+      },
+      '.MuiInputBase-input': {
+        color: '#fff !important'
+      },
+      '.auth-input-field': {
+        backgroundColor: 'rgba(25, 25, 40, 0.9) !important',
+        color: '#fff !important',
+        borderRadius: '4px !important',
+        '&.Mui-focused': {
+          backgroundColor: 'rgba(30, 30, 46, 0.9) !important',
+        }
+      },
+      '.auth-input-icon': {
+        color: '#78b6ff !important',
+        margin: '0 8px 0 0 !important',
+        padding: '0 !important',
+      },
+      '.auth-input-icon svg': {
+        color: '#78b6ff !important',
+        fontSize: '24px !important'
       },
     }}
   />
@@ -242,7 +276,8 @@ function SignInSignUp() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, #121212 0%, #1e1e1e 100%)',
+          background: 'linear-gradient(135deg, #2a1a5e 0%, #121212 100%)',
+          backgroundAttachment: 'fixed',
           px: { xs: 2, sm: 4 },
           py: { xs: 3, sm: 4 }
         }}
@@ -258,12 +293,13 @@ function SignInSignUp() {
           >
             <Box
               component="img"
-              src="/images/logo.svg"
+              src="/images/logo.png"
               alt="HangSmart Logo"
               sx={{ 
                 width: { xs: 120, sm: 150 }, 
                 height: { xs: 120, sm: 150 },
-                mb: 2
+                mb: 2,
+                filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.5))'
               }}
             />
             <Typography 
@@ -289,7 +325,8 @@ function SignInSignUp() {
               mx: 'auto',
               border: '1px solid rgba(144, 202, 249, 0.2)',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-              backgroundColor: '#1e1e1e'
+              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+              backdropFilter: 'blur(10px)'
             }}
           >
             <Typography 
@@ -316,17 +353,19 @@ function SignInSignUp() {
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonIcon color="primary" />
+                    <InputAdornment position="start" className="auth-input-icon">
+                      <PersonIcon />
                     </InputAdornment>
                   ),
+                  className: "auth-input-field"
                 }}
-                sx={{ mb: 2 }}
                 inputProps={{
                   sx: {
-                    backgroundColor: 'transparent'
+                    backgroundColor: 'transparent',
+                    color: '#ffffff'
                   }
                 }}
+                sx={{ mb: 2 }}
               />
             )}
             
@@ -339,17 +378,16 @@ function SignInSignUp() {
               variant="outlined"
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailIcon color="primary" />
+                  <InputAdornment position="start" className="auth-input-icon">
+                    <EmailIcon />
                   </InputAdornment>
                 ),
-                sx: {
-                  backgroundColor: 'transparent'
-                }
+                className: "auth-input-field"
               }}
               inputProps={{
                 sx: {
-                  backgroundColor: 'transparent'
+                  backgroundColor: 'transparent',
+                  color: '#ffffff'
                 }
               }}
               sx={{ mb: 2 }}
@@ -364,8 +402,8 @@ function SignInSignUp() {
               variant="outlined"
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
-                    <LockIcon color="primary" />
+                  <InputAdornment position="start" className="auth-input-icon">
+                    <LockIcon />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -375,18 +413,18 @@ function SignInSignUp() {
                       onClick={handleClickShowPassword}
                       edge="end"
                       size={isMobile ? "small" : "medium"}
+                      sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                     >
                       {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                     </IconButton>
                   </InputAdornment>
                 ),
-                sx: {
-                  backgroundColor: 'transparent'
-                }
+                className: "auth-input-field"
               }}
               inputProps={{
                 sx: {
-                  backgroundColor: 'transparent'
+                  backgroundColor: 'transparent',
+                  color: '#ffffff'
                 }
               }}
               sx={{ mb: 2 }}
@@ -402,8 +440,8 @@ function SignInSignUp() {
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
-                      <LockIcon color="primary" />
+                    <InputAdornment position="start" className="auth-input-icon">
+                      <LockIcon />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -413,18 +451,18 @@ function SignInSignUp() {
                         onClick={handleClickShowConfirmPassword}
                         edge="end"
                         size={isMobile ? "small" : "medium"}
+                        sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                       >
                         {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
-                  sx: {
-                    backgroundColor: 'transparent'
-                  }
+                  className: "auth-input-field"
                 }}
                 inputProps={{
                   sx: {
-                    backgroundColor: 'transparent'
+                    backgroundColor: 'transparent',
+                    color: '#ffffff'
                   }
                 }}
                 sx={{ mb: 2 }}
