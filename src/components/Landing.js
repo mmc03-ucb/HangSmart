@@ -20,12 +20,15 @@ import {
   createTheme,
   ThemeProvider,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { Logout as LogoutIcon, Person as PersonIcon, Add as AddIcon, Login as LoginIcon } from '@mui/icons-material';
 import { auth, db } from '../firebase/config';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 // Create a responsive dark theme
 const darkTheme = createTheme({
@@ -108,6 +111,9 @@ function Landing() {
   const [joinGroupOpen, setJoinGroupOpen] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [groupCode, setGroupCode] = useState('');
+  const [error, setError] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -145,18 +151,89 @@ function Landing() {
     }
   };
 
-  const handleCreateGroup = () => {
-    console.log("Create group with name:", groupName);
-    setGroupName('');
-    setCreateGroupOpen(false);
-    alert("Group creation functionality will be implemented later");
+  const generateGroupId = () => {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
   };
 
-  const handleJoinGroup = () => {
-    console.log("Join group with code:", groupCode);
-    setGroupCode('');
-    setJoinGroupOpen(false);
-    alert("Group joining functionality will be implemented later");
+  const handleCreateGroup = async () => {
+    if (!groupName.trim()) {
+      setError('Please enter a group name');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    try {
+      const groupId = generateGroupId();
+      const groupRef = doc(db, 'groups', groupId);
+      
+      // Create the group document
+      await setDoc(groupRef, {
+        name: groupName.trim(),
+        createdAt: new Date(),
+        members: [{
+          uid: auth.currentUser.uid,
+          name: userName
+        }]
+      });
+
+      setGroupName('');
+      setCreateGroupOpen(false);
+      navigate(`/prompt/${groupId}`);
+    } catch (err) {
+      setError('Failed to create group. Please try again.');
+      setSnackbarOpen(true);
+      console.error("Error creating group:", err.message);
+    }
+  };
+
+  const handleJoinGroup = async () => {
+    if (!groupCode.trim()) {
+      setError('Please enter a group code');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    try {
+      const groupRef = doc(db, 'groups', groupCode.trim().toUpperCase());
+      const groupDoc = await getDoc(groupRef);
+
+      if (!groupDoc.exists()) {
+        setError('Group not found. Please check the code and try again.');
+        setSnackbarOpen(true);
+        return;
+      }
+
+      const groupData = groupDoc.data();
+      const members = groupData.members || [];
+      
+      // Check if user is already a member
+      if (members.some(member => member.uid === auth.currentUser.uid)) {
+        navigate(`/prompt/${groupCode.trim().toUpperCase()}`);
+        return;
+      }
+
+      // Add user to the group
+      await setDoc(groupRef, {
+        ...groupData,
+        members: [...members, {
+          uid: auth.currentUser.uid,
+          name: userName
+        }]
+      }, { merge: true });
+
+      setGroupCode('');
+      setJoinGroupOpen(false);
+      navigate(`/prompt/${groupCode.trim().toUpperCase()}`);
+    } catch (err) {
+      setError('Failed to join group. Please try again.');
+      setSnackbarOpen(true);
+      console.error("Error joining group:", err.message);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+    setError('');
   };
 
   if (loading) {
@@ -249,31 +326,23 @@ function Landing() {
                   variant="h5" 
                   align="center" 
                   gutterBottom
-                  sx={{ mt: { xs: 1, sm: 2 } }}
+                  sx={{ mt: 1 }}
                 >
-                  Create a Group
+                  Create Group
                 </Typography>
                 <Typography 
                   variant="body1" 
                   align="center" 
-                  sx={{ 
-                    mb: { xs: 2, sm: 3 },
-                    px: { xs: 1, sm: 2 } 
-                  }}
+                  color="textSecondary"
+                  sx={{ mb: 2 }}
                 >
-                  Start a new group and invite your friends to join with a unique code
+                  Start a new group and invite friends to join
                 </Typography>
-                <Button
-                  variant="contained"
-                  size={isMobile ? "medium" : "large"}
+                <Button 
+                  variant="contained" 
+                  color="primary" 
                   onClick={() => setCreateGroupOpen(true)}
-                  fullWidth
-                  sx={{ 
-                    py: { xs: 1, sm: 1.5 },
-                    fontSize: { xs: '0.9rem', sm: '1.1rem' },
-                    borderRadius: '28px',
-                    mt: 'auto'
-                  }}
+                  sx={{ mt: 'auto' }}
                 >
                   Create Group
                 </Button>
@@ -313,32 +382,23 @@ function Landing() {
                   variant="h5" 
                   align="center" 
                   gutterBottom
-                  sx={{ mt: { xs: 1, sm: 2 } }}
+                  sx={{ mt: 1 }}
                 >
-                  Join a Group
+                  Join Group
                 </Typography>
                 <Typography 
                   variant="body1" 
                   align="center" 
-                  sx={{ 
-                    mb: { xs: 2, sm: 3 },
-                    px: { xs: 1, sm: 2 } 
-                  }}
+                  color="textSecondary"
+                  sx={{ mb: 2 }}
                 >
-                  Enter a 6-digit code to join your friends' group
+                  Join an existing group with a group code
                 </Typography>
-                <Button
-                  variant="contained"
-                  size={isMobile ? "medium" : "large"}
-                  color="secondary"
+                <Button 
+                  variant="contained" 
+                  color="secondary" 
                   onClick={() => setJoinGroupOpen(true)}
-                  fullWidth
-                  sx={{ 
-                    py: { xs: 1, sm: 1.5 },
-                    fontSize: { xs: '0.9rem', sm: '1.1rem' },
-                    borderRadius: '28px',
-                    mt: 'auto'
-                  }}
+                  sx={{ mt: 'auto' }}
                 >
                   Join Group
                 </Button>
@@ -346,69 +406,60 @@ function Landing() {
             </Grid>
           </Grid>
         </Container>
+
+        <Dialog open={createGroupOpen} onClose={() => setCreateGroupOpen(false)}>
+          <DialogTitle>Create New Group</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Group Name"
+              type="text"
+              fullWidth
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+              error={!!error && !groupName.trim()}
+              helperText={error && !groupName.trim() ? error : ''}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setCreateGroupOpen(false)}>Cancel</Button>
+            <Button onClick={handleCreateGroup} color="primary">Create</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={joinGroupOpen} onClose={() => setJoinGroupOpen(false)}>
+          <DialogTitle>Join Group</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Group Code"
+              type="text"
+              fullWidth
+              value={groupCode}
+              onChange={(e) => setGroupCode(e.target.value)}
+              error={!!error && !groupCode.trim()}
+              helperText={error && !groupCode.trim() ? error : ''}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setJoinGroupOpen(false)}>Cancel</Button>
+            <Button onClick={handleJoinGroup} color="primary">Join</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar 
+          open={snackbarOpen} 
+          autoHideDuration={6000} 
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
+            {error}
+          </Alert>
+        </Snackbar>
       </Box>
-
-      {/* Create Group Dialog */}
-      <Dialog 
-        open={createGroupOpen} 
-        onClose={() => setCreateGroupOpen(false)} 
-        maxWidth="sm" 
-        fullWidth
-        fullScreen={isMobile}
-      >
-        <DialogTitle sx={{ pt: { xs: 2, sm: 3 } }}>Create a New Group</DialogTitle>
-        <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>
-          <Typography gutterBottom sx={{ mb: 2 }}>
-            Create a group and invite your friends to join with a unique code.
-          </Typography>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Group Name"
-            fullWidth
-            value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
-            variant="outlined"
-          />
-        </DialogContent>
-        <DialogActions sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
-          <Button onClick={() => setCreateGroupOpen(false)}>Cancel</Button>
-          <Button onClick={handleCreateGroup} color="primary" disabled={!groupName} variant="contained">
-            Create Group
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Join Group Dialog */}
-      <Dialog 
-        open={joinGroupOpen} 
-        onClose={() => setJoinGroupOpen(false)} 
-        maxWidth="sm" 
-        fullWidth
-        fullScreen={isMobile}
-      >
-        <DialogTitle sx={{ pt: { xs: 2, sm: 3 } }}>Join a Group</DialogTitle>
-        <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>
-          <Typography gutterBottom sx={{ mb: 2 }}>
-            Enter the 6-digit group code to join an existing group.
-          </Typography>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Group Code"
-            fullWidth
-            value={groupCode}
-            onChange={(e) => setGroupCode(e.target.value)}
-            variant="outlined"
-          />
-        </DialogContent>
-        <DialogActions sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
-          <Button onClick={() => setJoinGroupOpen(false)}>Cancel</Button>
-          <Button onClick={handleJoinGroup} color="secondary" disabled={!groupCode} variant="contained">
-            Join Group
-          </Button>
-        </DialogActions>
-      </Dialog>
     </ThemeProvider>
   );
 }
