@@ -130,6 +130,14 @@ function PromptInput() {
               setAvailability(currentMember.preferences.availability || '');
               setSpecialRequests(currentMember.preferences.specialRequests || '');
             }
+
+            // Check if all users have provided preferences and there are at least 2 users
+            const allUsersHavePreferences = data.members.every(member => member.preferences);
+            const hasEnoughUsers = data.members.length >= 2;
+
+            if (allUsersHavePreferences && hasEnoughUsers) {
+              navigate(`/recommendations/${groupId}`);
+            }
           }
           
           setLoading(false);
