@@ -1,70 +1,117 @@
-# Getting Started with Create React App
+# 🧠 Group Activity Recommender
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A web app that lets friends form groups, enter their interests and availability in free-form text, and get AI-generated activity suggestions using Perplexity API.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🚀 High-Level Architecture
 
-### `npm start`
+### 🖼️ Frontend
+- **React** with **Tailwind CSS** or **Material UI** for modern UI
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🔧 Backend
+- **Node.js + Express** or **Python + FastAPI**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🗃️ Database
+- **Firebase Firestore** or **MongoDB**  
+  (Flexible NoSQL structure supports varied user input)
 
-### `npm test`
+### 🔐 Authentication
+- **Firebase Auth** or **Auth0**
+- Supports Google sign-in or email/password
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🤖 LLM Recommendation API
+- **Perplexity API**  
+  Used to suggest common activities based on users’ natural language inputs
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## ⚙️ Core Features and Flow
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 1. 🧾 User Authentication
+- Sign in with Google or email/password
+- Store basic user info (UID, name, email) in the database
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 2. 👥 Group Flow
+- Users can **create** or **join** a group
+- Groups identified by a unique code (UUID or 6-digit code)
 
-### `npm run eject`
+### 3. 🗨️ Interest Input
+- Free-form text input:  
+  _"I love Italian food and hiking, free Tue/Thu 6–9PM"_
+- Stored per user under `groups/{groupID}/preferences/{userID}`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 4. 🧠 LLM Integration
+- Once 2+ users submit their preferences:
+  - Send a prompt to Perplexity API:
+    ```
+    Suggest a common activity for these users:
+    User 1: Italian food, hiking, Tue/Thu 6–9PM
+    User 2: Sushi, movies, Wed/Thu evenings
+    ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 5. 🧭 Recommendation Display
+- Display suggested activity with helpful links  
+  (e.g., Google Maps location or YouTube trailer)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🛠️ Step-by-Step Implementation Guide
 
-## Learn More
+### Step 1: Project Setup
+- Initialize monorepo or separate frontend/backend folders
+- Set up Firebase or MongoDB
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Step 2: Authentication
+- Implement Firebase Auth (Google or email/password)
+- Store user info in DB on login
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Step 3: Group Logic
+- **Create group**: generate UUID, store creator's user ID
+- **Join group**: validate group code, add user to members list
 
-### Code Splitting
+### Step 4: Interest Input
+- Input field with placeholder:
+  _"Mention your interests, food preferences, and availability..."_
+- Store text in database
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Step 5: Trigger Matching
+- When 2+ users submit:
+  - Backend aggregates text
+  - Query Perplexity API with combined preferences
+  - Parse and display the recommendation
 
-### Analyzing the Bundle Size
+### Step 6: Frontend UI
+**Pages:**
+- `Home`: Login / Signup
+- `Dashboard`: Create or join a group
+- `Group Page`: Submit interests, view group info, see suggestions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+**Components:**
+- `InterestForm`
+- `GroupInfo`
+- `RecommendationDisplay`
+- Map view (optional) with activity location
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## ✨ Optional Enhancements
 
-### Advanced Configuration
+- Use structured form inputs instead of free text
+- Integrate with calendar APIs to match availability
+- Display compatibility scores between users
+- Use embeddings to semantically match user preferences
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## 📦 Tech Stack Summary
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+| Layer       | Tech Choices                      |
+|-------------|-----------------------------------|
+| Frontend    | React, Tailwind CSS / MUI         |
+| Backend     | Node.js + Express / Python + FastAPI |
+| Auth        | Firebase Auth / Auth0             |
+| Database    | Firebase Firestore / MongoDB      |
+| AI API      | Perplexity API                    |
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
