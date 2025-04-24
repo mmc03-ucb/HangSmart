@@ -1,9 +1,101 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box, Paper, Divider, Snackbar, Alert } from '@mui/material';
-import { Google as GoogleIcon } from '@mui/icons-material';
+import { 
+  TextField, 
+  Button, 
+  Typography, 
+  Box, 
+  Paper, 
+  Divider, 
+  Snackbar, 
+  Alert,
+  Container,
+  CssBaseline,
+  createTheme,
+  ThemeProvider,
+  useMediaQuery,
+  useTheme,
+  InputAdornment,
+  IconButton
+} from '@mui/material';
+import { 
+  Google as GoogleIcon, 
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+  Email as EmailIcon,
+  Lock as LockIcon,
+  Person as PersonIcon
+} from '@mui/icons-material';
 import { auth, db, provider } from '../firebase/config';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+
+// Create a responsive dark theme
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#90caf9',
+    },
+    secondary: {
+      main: '#f48fb1',
+    },
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+  },
+  typography: {
+    h4: {
+      fontSize: '2rem',
+      '@media (max-width:600px)': {
+        fontSize: '1.5rem',
+      },
+    },
+    h5: {
+      fontSize: '1.5rem',
+      '@media (max-width:600px)': {
+        fontSize: '1.25rem',
+      },
+    },
+    h6: {
+      fontSize: '1.25rem',
+      '@media (max-width:600px)': {
+        fontSize: '1rem',
+      },
+    },
+    body1: {
+      '@media (max-width:600px)': {
+        fontSize: '0.875rem',
+      },
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          '@media (max-width:600px)': {
+            padding: '8px 16px',
+            fontSize: '0.875rem',
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          marginBottom: '16px',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+      },
+    },
+  },
+});
 
 function SignInSignUp() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -13,6 +105,11 @@ function SignInSignUp() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleToggle = () => {
     setIsSignUp(!isSignUp);
@@ -24,6 +121,12 @@ function SignInSignUp() {
   };
 
   const handleSignIn = async () => {
+    if (!email || !password) {
+      setError("Please enter both email and password");
+      setSnackbarOpen(true);
+      return;
+    }
+    
     try {
       await signInWithEmailAndPassword(auth, email, password);
       window.location.href = '/landing';
@@ -34,6 +137,12 @@ function SignInSignUp() {
   };
 
   const handleSignUp = async () => {
+    if (!name || !email || !password || !confirmPassword) {
+      setError('Please fill in all fields');
+      setSnackbarOpen(true);
+      return;
+    }
+    
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       setSnackbarOpen(true);
@@ -82,38 +191,219 @@ function SignInSignUp() {
     }
   };
 
-  return (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100vh" bgcolor="#e0f7fa">
-      <Paper elevation={6} sx={{ padding: 4, borderRadius: 3, minWidth: 350, maxWidth: 400, textAlign: 'center' }}>
-        <Typography variant="h4" color="primary" gutterBottom>
-          {isSignUp ? 'Create Account' : 'Welcome'}
-        </Typography>
-        <Divider sx={{ marginBottom: 2 }} />
-        {isSignUp && (
-          <TextField fullWidth margin="normal" label="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        )}
-        <TextField fullWidth margin="normal" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <TextField fullWidth margin="normal" label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        {isSignUp && (
-          <TextField fullWidth margin="normal" label="Confirm Password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-        )}
-        <Button fullWidth variant="contained" color="primary" onClick={isSignUp ? handleSignUp : handleSignIn} sx={{ marginTop: 2, padding: 1.2 }}>
-          {isSignUp ? 'Sign Up' : 'Sign In'}
-        </Button>
-        <Button fullWidth variant="outlined" color="primary" startIcon={<GoogleIcon />} onClick={handleGoogleSignIn} sx={{ marginTop: 2, padding: 1.2 }}>
-          Sign In with Google
-        </Button>
-        <Typography variant="body2" sx={{ marginTop: 2 }} onClick={handleToggle} color="textSecondary" style={{ cursor: 'pointer' }}>
-          {isSignUp ? 'Already have an account? Sign In' : 'Don’t have an account? Sign Up'}
-        </Typography>
-      </Paper>
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
-      <Snackbar open={snackbarOpen} autoHideDuration={4000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
-          {error}
-        </Alert>
-      </Snackbar>
-    </Box>
+  return (
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <Box 
+        sx={{ 
+          minHeight: '100vh', 
+          display: 'flex', 
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, #121212 0%, #1e1e1e 100%)',
+          px: { xs: 2, sm: 4 },
+          py: { xs: 3, sm: 4 }
+        }}
+      >
+        <Container maxWidth="sm">
+          <Paper 
+            elevation={6} 
+            sx={{ 
+              p: { xs: 3, sm: 4 }, 
+              borderRadius: 3, 
+              width: '100%',
+              maxWidth: 450,
+              mx: 'auto',
+              border: '1px solid rgba(144, 202, 249, 0.2)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            <Typography 
+              variant="h4" 
+              color="primary" 
+              gutterBottom 
+              sx={{ 
+                fontWeight: 'bold',
+                textAlign: 'center',
+                mb: 2
+              }}
+            >
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
+            </Typography>
+            
+            <Divider sx={{ mb: 3, opacity: 0.6 }} />
+            
+            {isSignUp && (
+              <TextField
+                fullWidth
+                label="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ mb: 2 }}
+              />
+            )}
+            
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ mb: 2 }}
+            />
+            
+            <TextField
+              fullWidth
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon color="primary" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ mb: 2 }}
+            />
+            
+            {isSignUp && (
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle confirm password visibility"
+                        onClick={handleClickShowConfirmPassword}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ mb: 2 }}
+              />
+            )}
+            
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              onClick={isSignUp ? handleSignUp : handleSignIn}
+              sx={{
+                mt: 1,
+                mb: 2,
+                py: { xs: 1, sm: 1.5 },
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                borderRadius: '28px',
+                fontWeight: 'bold'
+              }}
+            >
+              {isSignUp ? 'Create Account' : 'Sign In'}
+            </Button>
+            
+            <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              startIcon={<GoogleIcon />}
+              onClick={handleGoogleSignIn}
+              sx={{
+                mb: 3,
+                py: { xs: 1, sm: 1.5 },
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                borderRadius: '28px'
+              }}
+            >
+              Continue with Google
+            </Button>
+            
+            <Typography
+              variant="body2"
+              align="center"
+              onClick={handleToggle}
+              color="primary"
+              sx={{
+                cursor: 'pointer',
+                transition: 'color 0.2s',
+                '&:hover': {
+                  color: theme => theme.palette.primary.light,
+                  textDecoration: 'underline'
+                }
+              }}
+            >
+              {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
+            </Typography>
+          </Paper>
+        </Container>
+
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={4000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert
+            onClose={handleSnackbarClose}
+            severity="error"
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {error}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </ThemeProvider>
   );
 }
 
