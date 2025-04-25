@@ -1,3 +1,7 @@
+/**
+ * Component for displaying activity recommendations for a group
+ * Shows personalized suggestions based on group member preferences
+ */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -25,7 +29,9 @@ import {
   CardContent,
   CardActions,
   Button,
-  Link
+  Link,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { 
   Person as PersonIcon, 
@@ -39,7 +45,7 @@ import {
 } from '@mui/icons-material';
 import { auth, db } from '../firebase/config';
 import { doc, onSnapshot } from 'firebase/firestore';
-import mockRecommendationData from '../mockbackend';
+import { getRecommendations } from '../services/recommendationService';
 import PlaceDetails from './PlaceDetails';
 
 // Create a responsive dark theme
@@ -84,22 +90,47 @@ const darkTheme = createTheme({
   },
 });
 
+/**
+ * Recommendations component for displaying group activity suggestions
+ * Fetches and displays personalized recommendations based on group preferences
+ */
 function Recommendations() {
+  // Component state management
   const { groupId } = useParams();
   const [groupData, setGroupData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [recommendations, setRecommendations] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const navigate = useNavigate();
   const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
 
+  // Fetch group data and recommendations
   useEffect(() => {
     const groupRef = doc(db, 'groups', groupId);
     
     const unsubscribe = onSnapshot(groupRef, 
-      (doc) => {
+      async (doc) => {
         if (doc.exists()) {
           const data = doc.data();
           setGroupData(data);
+          
+          // Check if all members have provided preferences
+          const allMembersHavePreferences = data.members.every(member => member.preferences);
+          if (allMembersHavePreferences && data.members.length >= 2) {
+            try {
+              const recommendations = await getRecommendations(data);
+              setRecommendations(recommendations);
+            } catch (error) {
+              console.error('Error getting recommendations:', error);
+              setSnackbarMessage('Failed to get recommendations. Please try again.');
+              setSnackbarSeverity('error');
+              setSnackbarOpen(true);
+            }
+          }
+          
           setLoading(false);
         } else {
           setError('Group not found');
@@ -116,10 +147,17 @@ function Recommendations() {
     return () => unsubscribe();
   }, [groupId]);
 
+  // Navigation handlers
   const handleBack = () => {
     navigate('/landing');
   };
 
+  // UI handlers
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
+  // Loading state
   if (loading) {
     return (
       <ThemeProvider theme={darkTheme}>
@@ -131,6 +169,7 @@ function Recommendations() {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <ThemeProvider theme={darkTheme}>
@@ -206,7 +245,7 @@ function Recommendations() {
             {/* Main Content - Recommendations */}
             <Box sx={{ 
               flex: { xs: '1 1 auto', lg: '2 1 0%' },
-              minWidth: 0 // Prevents flex item from overflowing
+              minWidth: 0
             }}>
               <Paper 
                 elevation={3} 
@@ -225,158 +264,170 @@ function Recommendations() {
                   }}>
                     Top Recommendations
                   </Typography>
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      color: 'primary.main',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1
-                    }}
-                  >
-                    <CalendarIcon fontSize="small" />
-                    {mockRecommendationData.date}
-                  </Typography>
-                </Box>
-                <Typography variant="body1" color="textSecondary" paragraph sx={{ mb: 3 }}>
-                  {mockRecommendationData.message}
-                </Typography>
-
-                <Stack spacing={3}>
-                  {mockRecommendationData.activities.slice(0, 2).map((activity, index) => (
-                    <Card 
-                      key={index}
+                  {recommendations && (
+                    <Typography 
+                      variant="h6" 
                       sx={{ 
-                        background: 'rgba(30, 30, 46, 0.5)',
-                        border: '1px solid rgba(144, 202, 249, 0.2)',
-                        transition: 'transform 0.2s',
-                        '&:hover': {
-                          transform: 'translateY(-4px)',
-                        }
+                        color: 'primary.main',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
                       }}
                     >
-                      <CardContent>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                          <StarIcon color="primary" sx={{ mr: 1 }} />
-                          <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+                      <CalendarIcon fontSize="small" />
+                      {recommendations.date}
+                    </Typography>
+                  )}
+                </Box>
+                {recommendations ? (
+                  <>
+                    <Typography variant="body1" color="textSecondary" paragraph sx={{ mb: 3 }}>
+                      {recommendations.message}
+                    </Typography>
+
+                    <Stack spacing={3}>
+                      {recommendations.activities.slice(0, 2).map((activity, index) => (
+                        <Card 
+                          key={index}
+                          sx={{ 
+                            background: 'rgba(30, 30, 46, 0.5)',
+                            border: '1px solid rgba(144, 202, 249, 0.2)',
+                            transition: 'transform 0.2s',
+                            '&:hover': {
+                              transform: 'translateY(-4px)',
+                            }
+                          }}
+                        >
+                          <CardContent>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                              <StarIcon color="primary" sx={{ mr: 1 }} />
+                              <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+                                {activity.title}
+                              </Typography>
+                            </Box>
+                            <Typography variant="body1" color="text.secondary" paragraph>
+                              {activity.content}
+                            </Typography>
+                            {activity.location && (
+                              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                <LocationIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                                <Typography variant="body2" color="text.secondary">
+                                  {activity.location}
+                                </Typography>
+                              </Box>
+                            )}
+                            {activity.requests && (
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <InfoIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                                <Typography variant="body2" color="text.secondary">
+                                  {activity.requests}
+                                </Typography>
+                              </Box>
+                            )}
+                          </CardContent>
+                          {activity.url && (
+                            <CardActions>
+                              <Button 
+                                size="small" 
+                                component={Link} 
+                                href={activity.url} 
+                                target="_blank"
+                                endIcon={<OpenInNewIcon />}
+                                sx={{ 
+                                  color: 'primary.main',
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(144, 202, 249, 0.1)'
+                                  }
+                                }}
+                              >
+                                Learn More
+                              </Button>
+                            </CardActions>
+                          )}
+                          {activity.placeId && (
+                            <Box sx={{ p: 2 }}>
+                              <PlaceDetails placeId={activity.placeId} />
+                            </Box>
+                          )}
+                        </Card>
+                      ))}
+                    </Stack>
+                  </>
+                ) : (
+                  <Typography variant="body1" color="textSecondary" paragraph>
+                    Waiting for all group members to provide their preferences...
+                  </Typography>
+                )}
+              </Paper>
+
+              {recommendations && recommendations.activities.length > 2 && (
+                <Paper 
+                  elevation={3} 
+                  sx={{ 
+                    p: { xs: 2, sm: 3 }, 
+                    borderRadius: 2,
+                    border: '1px solid rgba(144, 202, 249, 0.2)',
+                    background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                  }}
+                >
+                  <Typography variant="h4" gutterBottom sx={{ 
+                    fontSize: { xs: '1.5rem', sm: '2rem' },
+                    mb: 2
+                  }}>
+                    Other Recommendations
+                  </Typography>
+
+                  <Stack spacing={2}>
+                    {recommendations.activities.slice(2).map((activity, index) => (
+                      <Card 
+                        key={index}
+                        sx={{ 
+                          background: 'rgba(30, 30, 46, 0.5)',
+                          border: '1px solid rgba(144, 202, 249, 0.2)',
+                          transition: 'transform 0.2s',
+                          '&:hover': {
+                            transform: 'translateY(-4px)',
+                          }
+                        }}
+                      >
+                        <CardContent>
+                          <Typography variant="h6" component="div" gutterBottom>
                             {activity.title}
                           </Typography>
-                        </Box>
-                        <Typography variant="body1" color="text.secondary" paragraph>
-                          {activity.content}
-                        </Typography>
-                        {activity.location && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                            <LocationIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                            <Typography variant="body2" color="text.secondary">
-                              {activity.location}
-                            </Typography>
+                          <Typography variant="body1" color="text.secondary">
+                            {activity.content}
+                          </Typography>
+                        </CardContent>
+                        {activity.url && (
+                          <CardActions>
+                            <Button 
+                              size="small" 
+                              component={Link} 
+                              href={activity.url} 
+                              target="_blank"
+                              endIcon={<OpenInNewIcon />}
+                              sx={{ 
+                                color: 'primary.main',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(144, 202, 249, 0.1)'
+                                }
+                              }}
+                            >
+                              Learn More
+                            </Button>
+                          </CardActions>
+                        )}
+                        {activity.placeId && (
+                          <Box sx={{ p: 2 }}>
+                            <PlaceDetails placeId={activity.placeId} />
                           </Box>
                         )}
-                        {activity.requests && (
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <InfoIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                            <Typography variant="body2" color="text.secondary">
-                              {activity.requests}
-                            </Typography>
-                          </Box>
-                        )}
-                      </CardContent>
-                      {activity.url && (
-                        <CardActions>
-                          <Button 
-                            size="small" 
-                            component={Link} 
-                            href={activity.url} 
-                            target="_blank"
-                            endIcon={<OpenInNewIcon />}
-                            sx={{ 
-                              color: 'primary.main',
-                              '&:hover': {
-                                backgroundColor: 'rgba(144, 202, 249, 0.1)'
-                              }
-                            }}
-                          >
-                            Learn More
-                          </Button>
-                        </CardActions>
-                      )}
-                      {activity.title.includes("Star Wars") && (
-                        <Box sx={{ p: 2 }}>
-                          <PlaceDetails placeId="ChIJcawkWTyuEmsRHdzQ6c68aMw" />
-                        </Box>
-                      )}
-                      {activity.title.includes("Fat Thaigar") && (
-                        <Box sx={{ p: 2 }}>
-                          <PlaceDetails placeId="ChIJiUWOn5yvEmsRGTtwVQxloTk" />
-                        </Box>
-                      )}
-                    </Card>
-                  ))}
-                </Stack>
-              </Paper>
-
-              <Paper 
-                elevation={3} 
-                sx={{ 
-                  p: { xs: 2, sm: 3 }, 
-                  borderRadius: 2,
-                  border: '1px solid rgba(144, 202, 249, 0.2)',
-                  background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-                }}
-              >
-                <Typography variant="h4" gutterBottom sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem' },
-                  mb: 2
-                }}>
-                  Other Recommendations
-                </Typography>
-
-                <Stack spacing={2}>
-                  {mockRecommendationData.activities.slice(2).map((activity, index) => (
-                    <Card 
-                      key={index}
-                      sx={{ 
-                        background: 'rgba(30, 30, 46, 0.5)',
-                        border: '1px solid rgba(144, 202, 249, 0.2)',
-                        transition: 'transform 0.2s',
-                        '&:hover': {
-                          transform: 'translateY(-4px)',
-                        }
-                      }}
-                    >
-                      <CardContent>
-                        <Typography variant="h6" component="div" gutterBottom>
-                          {activity.title}
-                        </Typography>
-                        <Typography variant="body1" color="text.secondary">
-                          {activity.content}
-                        </Typography>
-                      </CardContent>
-                      {activity.url && (
-                        <CardActions>
-                          <Button 
-                            size="small" 
-                            component={Link} 
-                            href={activity.url} 
-                            target="_blank"
-                            endIcon={<OpenInNewIcon />}
-                            sx={{ 
-                              color: 'primary.main',
-                              '&:hover': {
-                                backgroundColor: 'rgba(144, 202, 249, 0.1)'
-                              }
-                            }}
-                          >
-                            Learn More
-                          </Button>
-                        </CardActions>
-                      )}
-                    </Card>
-                  ))}
-                </Stack>
-              </Paper>
+                      </Card>
+                    ))}
+                  </Stack>
+                </Paper>
+              )}
             </Box>
 
             {/* Sidebar - Group Members */}
@@ -501,6 +552,17 @@ function Recommendations() {
             </Box>
           </Box>
         </Container>
+
+        <Snackbar 
+          open={snackbarOpen} 
+          autoHideDuration={6000} 
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} variant="filled">
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );

@@ -1,3 +1,7 @@
+/**
+ * Component for collecting user preferences for group activities
+ * Handles input and submission of user interests, availability, and special requests
+ */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
@@ -97,7 +101,12 @@ const darkTheme = createTheme({
   },
 });
 
+/**
+ * PromptInput component for collecting user preferences
+ * Manages form state and submission to Firestore
+ */
 function PromptInput() {
+  // Component state management
   const { groupId } = useParams();
   const [groupData, setGroupData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -115,6 +124,7 @@ function PromptInput() {
   const navigate = useNavigate();
   const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
 
+  // Fetch and monitor group data
   useEffect(() => {
     const groupRef = doc(db, 'groups', groupId);
     
@@ -134,7 +144,7 @@ function PromptInput() {
               setLocation(currentMember.preferences.location || '');
             }
 
-            // Check if all users have provided preferences and there are at least 2 users
+            // Check if all users have provided preferences
             const allUsersHavePreferences = data.members.every(member => member.preferences);
             const hasEnoughUsers = data.members.length >= 2;
 
@@ -157,10 +167,12 @@ function PromptInput() {
     return () => unsubscribe();
   }, [groupId]);
 
+  // Navigation handlers
   const handleBack = () => {
     navigate('/landing');
   };
 
+  // Save user preferences to Firestore
   const handleSavePreferences = async () => {
     try {
       setSaving(true);
@@ -174,11 +186,10 @@ function PromptInput() {
       const currentData = groupDoc.data();
       const members = currentData.members || [];
       
-      // Find current user's index
+      // Find and update current user's preferences
       const memberIndex = members.findIndex(member => member.uid === auth.currentUser?.uid);
       
       if (memberIndex !== -1) {
-        // Update existing member preferences
         const updatedMembers = [...members];
         updatedMembers[memberIndex] = {
           ...updatedMembers[memberIndex],
@@ -189,7 +200,7 @@ function PromptInput() {
             location,
             updatedAt: new Date()
           },
-          photoURL: auth.currentUser?.photoURL || null // Save the user's profile picture URL
+          photoURL: auth.currentUser?.photoURL || null
         };
         
         await updateDoc(groupRef, { members: updatedMembers });
@@ -209,17 +220,19 @@ function PromptInput() {
     }
   };
 
+  // Calendar integration placeholder
   const handleConnectCalendar = () => {
-    // This is a dummy function - in a real app, this would open OAuth flow
     setSnackbarMessage('Google Calendar integration would happen here!');
     setSnackbarSeverity('info');
     setSnackbarOpen(true);
   };
 
+  // UI handlers
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
 
+  // Loading state
   if (loading) {
     return (
       <ThemeProvider theme={darkTheme}>
@@ -231,6 +244,7 @@ function PromptInput() {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <ThemeProvider theme={darkTheme}>

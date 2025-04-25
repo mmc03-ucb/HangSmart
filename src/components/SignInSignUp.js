@@ -1,3 +1,7 @@
+/**
+ * Authentication component for user sign-in and sign-up
+ * Handles email/password and Google authentication
+ */
 import React, { useState } from 'react';
 import { 
   TextField, 
@@ -163,7 +167,12 @@ const globalStyles = (
   />
 );
 
+/**
+ * SignInSignUp component that handles user authentication
+ * Provides both email/password and Google sign-in options
+ */
 function SignInSignUp() {
+  // State management for form fields and UI
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -177,15 +186,18 @@ function SignInSignUp() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // Toggle between sign-in and sign-up forms
   const handleToggle = () => {
     setIsSignUp(!isSignUp);
     setError('');
   };
 
+  // Handle snackbar close
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
 
+  // Handle email/password sign-in
   const handleSignIn = async () => {
     if (!email || !password) {
       setError("Please enter both email and password");
@@ -202,6 +214,7 @@ function SignInSignUp() {
     }
   };
 
+  // Handle email/password sign-up
   const handleSignUp = async () => {
     if (!name || !email || !password || !confirmPassword) {
       setError('Please fill in all fields');
@@ -219,6 +232,7 @@ function SignInSignUp() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Create user document in Firestore
       await setDoc(doc(db, 'users', user.uid), {
         name: name,
         email: email,
@@ -235,11 +249,13 @@ function SignInSignUp() {
     }
   };
 
+  // Handle Google authentication
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
+      // Create or update user document in Firestore
       const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, {
         name: user.displayName,
@@ -257,6 +273,7 @@ function SignInSignUp() {
     }
   };
 
+  // Toggle password visibility
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };

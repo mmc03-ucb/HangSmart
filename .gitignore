@@ -84,3 +84,6 @@ src/firebase/config.js
 config.js
 
 mockbackend.js
+src/mockbackend.js
+
+hidden

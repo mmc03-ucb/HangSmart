@@ -1,3 +1,7 @@
+/**
+ * User profile management component
+ * Handles viewing and updating user profile information
+ */
 import React, { useState, useEffect } from 'react';
 import { 
   Typography, 
@@ -108,7 +112,12 @@ const darkTheme = createTheme({
   },
 });
 
+/**
+ * Profile component for managing user account and preferences
+ * Handles profile updates, account deletion, and logout
+ */
 function Profile() {
+  // State management for user data and UI
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(true);
@@ -119,6 +128,7 @@ function Profile() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async (user) => {
       try {
@@ -149,6 +159,7 @@ function Profile() {
     return () => unsubscribe();
   }, []);
 
+  // Save profile changes
   const handleSave = async () => {
     if (!name || !email) {
       setSnackbarMessage("Name and email cannot be empty.");
@@ -171,6 +182,7 @@ function Profile() {
     }
   };
 
+  // Delete user account
   const handleDelete = async () => {
     try {
       const user = auth.currentUser;
@@ -186,6 +198,7 @@ function Profile() {
     }
   };
 
+  // Handle user logout
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -198,11 +211,13 @@ function Profile() {
     }
   };
 
+  // Dialog handlers
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
   const handleConfirmDelete = async () => { await handleDelete(); handleCloseDialog(); };
   const handleSnackbarClose = () => setSnackbarOpen(false);
 
+  // Loading state
   if (loading) {
     return (
       <ThemeProvider theme={darkTheme}>
