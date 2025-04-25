@@ -197,244 +197,289 @@ function Recommendations() {
           </Toolbar>
         </AppBar>
 
-        <Container maxWidth="md" sx={{ mt: { xs: 2, sm: 4 }, mb: 4 }}>
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: { xs: 2, sm: 3 }, 
-              mb: 3,
-              borderRadius: 2,
-              border: '1px solid rgba(144, 202, 249, 0.2)',
-              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            <Typography variant="h5" gutterBottom>
-              Group Members & Preferences
-            </Typography>
-            <Typography variant="body2" color="textSecondary" paragraph>
-              Here are all the group members and their preferences. We'll use this information to generate personalized recommendations.
-            </Typography>
+        <Container maxWidth="xl" sx={{ mt: { xs: 2, sm: 4 }, mb: 4 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', lg: 'row' },
+            gap: 3
+          }}>
+            {/* Main Content - Recommendations */}
+            <Box sx={{ 
+              flex: { xs: '1 1 auto', lg: '2 1 0%' },
+              minWidth: 0 // Prevents flex item from overflowing
+            }}>
+              <Paper 
+                elevation={3} 
+                sx={{ 
+                  p: { xs: 2, sm: 3 }, 
+                  mb: 3,
+                  borderRadius: 2,
+                  border: '1px solid rgba(144, 202, 249, 0.2)',
+                  background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                <Typography variant="h4" gutterBottom sx={{ 
+                  fontSize: { xs: '1.5rem', sm: '2rem' },
+                  mb: 2
+                }}>
+                  Top Recommendations
+                </Typography>
+                <Typography variant="body1" color="textSecondary" paragraph sx={{ mb: 3 }}>
+                  {mockRecommendationData.message}
+                </Typography>
 
-            <List>
-              {groupData?.members?.map((member, index) => (
-                <React.Fragment key={index}>
-                  <ListItem alignItems="flex-start">
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: member.uid === auth.currentUser?.uid ? 'primary.main' : 'grey.700' }}>
-                        <PersonIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle1" sx={{ fontWeight: member.uid === auth.currentUser?.uid ? 'bold' : 'normal' }}>
-                          {member.name}
-                          {member.uid === auth.currentUser?.uid && ' (You)'}
+                <Stack spacing={3}>
+                  {mockRecommendationData.activities.slice(0, 2).map((activity, index) => (
+                    <Card 
+                      key={index}
+                      sx={{ 
+                        background: 'rgba(30, 30, 46, 0.5)',
+                        border: '1px solid rgba(144, 202, 249, 0.2)',
+                        transition: 'transform 0.2s',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                        }
+                      }}
+                    >
+                      <CardContent>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                          <StarIcon color="primary" sx={{ mr: 1 }} />
+                          <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+                            {activity.title}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body1" color="text.secondary" paragraph>
+                          {activity.content}
                         </Typography>
-                      }
-                      secondary={
-                        <Stack spacing={1} sx={{ mt: 1 }}>
-                          {member.preferences?.interests && (
-                            <Box>
-                              <Chip
-                                icon={<InterestsIcon />}
-                                label="Interests"
-                                size="small"
-                                sx={{ mb: 1 }}
-                              />
-                              <Typography variant="body2" sx={{ ml: 1 }}>
-                                {member.preferences.interests}
-                              </Typography>
-                            </Box>
-                          )}
-                          
-                          {member.preferences?.location && (
-                            <Box>
-                              <Chip
-                                icon={<LocationIcon />}
-                                label="Location"
-                                size="small"
-                                sx={{ mb: 1 }}
-                              />
-                              <Typography variant="body2" sx={{ ml: 1 }}>
-                                {member.preferences.location}
-                              </Typography>
-                            </Box>
-                          )}
-                          
-                          {member.preferences?.availability && (
-                            <Box>
-                              <Chip
-                                icon={<CalendarIcon />}
-                                label="Availability"
-                                size="small"
-                                sx={{ mb: 1 }}
-                              />
-                              <Typography variant="body2" sx={{ ml: 1 }}>
-                                {member.preferences.availability}
-                              </Typography>
-                            </Box>
-                          )}
-                          
-                          {member.preferences?.specialRequests && (
-                            <Box>
-                              <Chip
-                                icon={<InfoIcon />}
-                                label="Special Requests"
-                                size="small"
-                                sx={{ mb: 1 }}
-                              />
-                              <Typography variant="body2" sx={{ ml: 1 }}>
-                                {member.preferences.specialRequests}
-                              </Typography>
-                            </Box>
-                          )}
-                          
-                          {!member.preferences && (
-                            <Typography variant="body2" color="textSecondary">
-                              No preferences provided yet
+                        {activity.location && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <LocationIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                            <Typography variant="body2" color="text.secondary">
+                              {activity.location}
                             </Typography>
-                          )}
-                        </Stack>
-                      }
-                    />
-                  </ListItem>
-                  {index < (groupData.members.length - 1) && <Divider variant="inset" component="li" />}
-                </React.Fragment>
-              ))}
-            </List>
-          </Paper>
+                          </Box>
+                        )}
+                        {activity.requests && (
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <InfoIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                            <Typography variant="body2" color="text.secondary">
+                              {activity.requests}
+                            </Typography>
+                          </Box>
+                        )}
+                      </CardContent>
+                      {activity.url && (
+                        <CardActions>
+                          <Button 
+                            size="small" 
+                            component={Link} 
+                            href={activity.url} 
+                            target="_blank"
+                            endIcon={<OpenInNewIcon />}
+                            sx={{ 
+                              color: 'primary.main',
+                              '&:hover': {
+                                backgroundColor: 'rgba(144, 202, 249, 0.1)'
+                              }
+                            }}
+                          >
+                            Learn More
+                          </Button>
+                        </CardActions>
+                      )}
+                      {activity.title.includes("Star Wars") && (
+                        <Box sx={{ p: 2 }}>
+                          <PlaceDetails placeId="ChIJcawkWTyuEmsRHdzQ6c68aMw" />
+                        </Box>
+                      )}
+                      {activity.title.includes("Fat Thaigar") && (
+                        <Box sx={{ p: 2 }}>
+                          <PlaceDetails placeId="ChIJiUWOn5yvEmsRGTtwVQxloTk" />
+                        </Box>
+                      )}
+                    </Card>
+                  ))}
+                </Stack>
+              </Paper>
 
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: { xs: 2, sm: 3 }, 
-              mb: 3,
-              borderRadius: 2,
-              border: '1px solid rgba(144, 202, 249, 0.2)',
-              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            <Typography variant="h5" gutterBottom>
-              Top Recommendations
-            </Typography>
-            <Typography variant="body2" color="textSecondary" paragraph>
-              {mockRecommendationData.message}
-            </Typography>
+              <Paper 
+                elevation={3} 
+                sx={{ 
+                  p: { xs: 2, sm: 3 }, 
+                  borderRadius: 2,
+                  border: '1px solid rgba(144, 202, 249, 0.2)',
+                  background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                <Typography variant="h4" gutterBottom sx={{ 
+                  fontSize: { xs: '1.5rem', sm: '2rem' },
+                  mb: 2
+                }}>
+                  Other Recommendations
+                </Typography>
 
-            <Stack spacing={2}>
-              {mockRecommendationData.activities.slice(0, 2).map((activity, index) => (
-                <Card 
-                  key={index}
-                  sx={{ 
-                    background: 'rgba(30, 30, 46, 0.5)',
-                    border: '1px solid rgba(144, 202, 249, 0.2)',
-                  }}
-                >
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <StarIcon color="primary" sx={{ mr: 1 }} />
-                      <Typography variant="h6" component="div">
-                        {activity.title}
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      {activity.content}
-                    </Typography>
-                    {activity.location && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <LocationIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                        <Typography variant="body2" color="text.secondary">
-                          {activity.location}
+                <Stack spacing={2}>
+                  {mockRecommendationData.activities.slice(2).map((activity, index) => (
+                    <Card 
+                      key={index}
+                      sx={{ 
+                        background: 'rgba(30, 30, 46, 0.5)',
+                        border: '1px solid rgba(144, 202, 249, 0.2)',
+                        transition: 'transform 0.2s',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                        }
+                      }}
+                    >
+                      <CardContent>
+                        <Typography variant="h6" component="div" gutterBottom>
+                          {activity.title}
                         </Typography>
-                      </Box>
-                    )}
-                    {activity.requests && (
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <InfoIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                        <Typography variant="body2" color="text.secondary">
-                          {activity.requests}
+                        <Typography variant="body1" color="text.secondary">
+                          {activity.content}
                         </Typography>
-                      </Box>
-                    )}
-                  </CardContent>
-                  {activity.url && (
-                    <CardActions>
-                      <Button 
-                        size="small" 
-                        component={Link} 
-                        href={activity.url} 
-                        target="_blank"
-                        endIcon={<OpenInNewIcon />}
-                      >
-                        Learn More
-                      </Button>
-                    </CardActions>
-                  )}
-                  {activity.title.includes("Star Wars") && (
-                    <Box sx={{ p: 2 }}>
-                      <PlaceDetails placeId="ChIJcawkWTyuEmsRHdzQ6c68aMw" />
-                    </Box>
-                  )}
-                  {activity.title.includes("Fat Thaigar") && (
-                    <Box sx={{ p: 2 }}>
-                      <PlaceDetails placeId="ChIJiUWOn5yvEmsRGTtwVQxloTk" />
-                    </Box>
-                  )}
-                </Card>
-              ))}
-            </Stack>
-          </Paper>
+                      </CardContent>
+                      {activity.url && (
+                        <CardActions>
+                          <Button 
+                            size="small" 
+                            component={Link} 
+                            href={activity.url} 
+                            target="_blank"
+                            endIcon={<OpenInNewIcon />}
+                            sx={{ 
+                              color: 'primary.main',
+                              '&:hover': {
+                                backgroundColor: 'rgba(144, 202, 249, 0.1)'
+                              }
+                            }}
+                          >
+                            Learn More
+                          </Button>
+                        </CardActions>
+                      )}
+                    </Card>
+                  ))}
+                </Stack>
+              </Paper>
+            </Box>
 
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: { xs: 2, sm: 3 }, 
-              borderRadius: 2,
-              border: '1px solid rgba(144, 202, 249, 0.2)',
-              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            <Typography variant="h5" gutterBottom>
-              Other Recommendations
-            </Typography>
+            {/* Sidebar - Group Members */}
+            <Box sx={{ 
+              flex: { xs: '1 1 auto', lg: '1 1 0%' },
+              minWidth: 0 // Prevents flex item from overflowing
+            }}>
+              <Paper 
+                elevation={3} 
+                sx={{ 
+                  p: { xs: 2, sm: 3 }, 
+                  position: { lg: 'sticky' },
+                  top: { lg: 20 },
+                  borderRadius: 2,
+                  border: '1px solid rgba(144, 202, 249, 0.2)',
+                  background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                <Typography variant="h5" gutterBottom>
+                  Group Members
+                </Typography>
+                <Typography variant="body2" color="textSecondary" paragraph>
+                  Here are all the group members and their preferences.
+                </Typography>
 
-            <Stack spacing={2}>
-              {mockRecommendationData.activities.slice(2).map((activity, index) => (
-                <Card 
-                  key={index}
-                  sx={{ 
-                    background: 'rgba(30, 30, 46, 0.5)',
-                    border: '1px solid rgba(144, 202, 249, 0.2)',
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h6" component="div" gutterBottom>
-                      {activity.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {activity.content}
-                    </Typography>
-                  </CardContent>
-                  {activity.url && (
-                    <CardActions>
-                      <Button 
-                        size="small" 
-                        component={Link} 
-                        href={activity.url} 
-                        target="_blank"
-                        endIcon={<OpenInNewIcon />}
-                      >
-                        Learn More
-                      </Button>
-                    </CardActions>
-                  )}
-                </Card>
-              ))}
-            </Stack>
-          </Paper>
+                <List>
+                  {groupData?.members?.map((member, index) => (
+                    <React.Fragment key={index}>
+                      <ListItem alignItems="flex-start">
+                        <ListItemAvatar>
+                          <Avatar sx={{ bgcolor: member.uid === auth.currentUser?.uid ? 'primary.main' : 'grey.700' }}>
+                            <PersonIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Typography variant="subtitle1" sx={{ fontWeight: member.uid === auth.currentUser?.uid ? 'bold' : 'normal' }}>
+                              {member.name}
+                              {member.uid === auth.currentUser?.uid && ' (You)'}
+                            </Typography>
+                          }
+                          secondary={
+                            <Stack spacing={1} sx={{ mt: 1 }}>
+                              {member.preferences?.interests && (
+                                <Box>
+                                  <Chip
+                                    icon={<InterestsIcon />}
+                                    label="Interests"
+                                    size="small"
+                                    sx={{ mb: 1 }}
+                                  />
+                                  <Typography variant="body2" sx={{ ml: 1 }}>
+                                    {member.preferences.interests}
+                                  </Typography>
+                                </Box>
+                              )}
+                              
+                              {member.preferences?.location && (
+                                <Box>
+                                  <Chip
+                                    icon={<LocationIcon />}
+                                    label="Location"
+                                    size="small"
+                                    sx={{ mb: 1 }}
+                                  />
+                                  <Typography variant="body2" sx={{ ml: 1 }}>
+                                    {member.preferences.location}
+                                  </Typography>
+                                </Box>
+                              )}
+                              
+                              {member.preferences?.availability && (
+                                <Box>
+                                  <Chip
+                                    icon={<CalendarIcon />}
+                                    label="Availability"
+                                    size="small"
+                                    sx={{ mb: 1 }}
+                                  />
+                                  <Typography variant="body2" sx={{ ml: 1 }}>
+                                    {member.preferences.availability}
+                                  </Typography>
+                                </Box>
+                              )}
+                              
+                              {member.preferences?.specialRequests && (
+                                <Box>
+                                  <Chip
+                                    icon={<InfoIcon />}
+                                    label="Special Requests"
+                                    size="small"
+                                    sx={{ mb: 1 }}
+                                  />
+                                  <Typography variant="body2" sx={{ ml: 1 }}>
+                                    {member.preferences.specialRequests}
+                                  </Typography>
+                                </Box>
+                              )}
+                              
+                              {!member.preferences && (
+                                <Typography variant="body2" color="textSecondary">
+                                  No preferences provided yet
+                                </Typography>
+                              )}
+                            </Stack>
+                          }
+                        />
+                      </ListItem>
+                      {index < (groupData.members.length - 1) && <Divider variant="inset" component="li" />}
+                    </React.Fragment>
+                  ))}
+                </List>
+              </Paper>
+            </Box>
+          </Box>
         </Container>
       </Box>
     </ThemeProvider>
