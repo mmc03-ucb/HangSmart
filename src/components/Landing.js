@@ -331,7 +331,7 @@ function Landing() {
           </Box>
         
           <Typography variant="h4" align="center" color="textPrimary" gutterBottom>
-            Welcome, {userName ? userName : "User"}!
+            Welcome, {userName ? userName.split(' ')[0] : "User"}!
           </Typography>
           <Typography 
             variant="h6" 

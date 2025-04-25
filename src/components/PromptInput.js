@@ -463,7 +463,7 @@ function PromptInput() {
                   <ListItemText
                     primary={
                       <Typography variant="body1" sx={{ fontWeight: member.uid === auth.currentUser?.uid ? 'bold' : 'normal' }}>
-                        {member.name}
+                        {member.name.split(' ')[0]}
                         {member.uid === auth.currentUser?.uid && ' (You)'}
                       </Typography>
                     }
