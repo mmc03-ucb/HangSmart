@@ -27,7 +27,7 @@ import {
 import { Logout as LogoutIcon, Person as PersonIcon, Add as AddIcon, Login as LoginIcon } from '@mui/icons-material';
 import { auth, db } from '../firebase/config';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, query, getDocs, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 // Create a responsive dark theme
@@ -113,6 +113,7 @@ function Landing() {
   const [groupCode, setGroupCode] = useState('');
   const [error, setError] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [userGroups, setUserGroups] = useState([]);
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -131,9 +132,29 @@ function Landing() {
       }
     };
 
+    const fetchUserGroups = async (user) => {
+      try {
+        const groupsQuery = query(collection(db, 'groups'));
+        const querySnapshot = await getDocs(groupsQuery);
+        const groups = querySnapshot.docs
+          .filter(doc => {
+            const data = doc.data();
+            return data.members?.some(member => member.uid === user.uid);
+          })
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+        setUserGroups(groups);
+      } catch (err) {
+        console.error("Error fetching user groups:", err.message);
+      }
+    };
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchUserName(user);
+        fetchUserGroups(user);
       } else {
         window.location.href = '/';
       }
@@ -436,6 +457,52 @@ function Landing() {
             </Grid>
           </Grid>
         </Container>
+
+        {/* Existing Groups Section */}
+        {userGroups.length > 0 && (
+          <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+            <Typography variant="h5" gutterBottom sx={{ mb: 3, textAlign: 'center' }}>
+              Your Groups
+            </Typography>
+            <Grid container spacing={2}>
+              {userGroups.map((group) => (
+                <Grid item xs={12} sm={6} md={4} key={group.id}>
+                  <Paper 
+                    elevation={3} 
+                    sx={{ 
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
+                      },
+                      border: '1px solid rgba(144, 202, 249, 0.2)',
+                      background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+                    }}
+                    onClick={() => navigate(`/prompt/${group.id}`)}
+                  >
+                    <Typography variant="h6" gutterBottom sx={{ textAlign: 'center' }}>
+                      {group.name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <PersonIcon fontSize="small" />
+                      <Typography variant="body2" color="textSecondary">
+                        {group.members?.length || 0} members
+                      </Typography>
+                    </Box>
+                    <Typography variant="caption" color="textSecondary">
+                      Group Code: {group.id}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        )}
 
         <Dialog open={createGroupOpen} onClose={() => setCreateGroupOpen(false)}
           PaperProps={{
