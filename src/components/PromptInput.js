@@ -188,7 +188,8 @@ function PromptInput() {
             specialRequests,
             location,
             updatedAt: new Date()
-          }
+          },
+          photoURL: auth.currentUser?.photoURL || null // Save the user's profile picture URL
         };
         
         await updateDoc(groupRef, { members: updatedMembers });
@@ -448,7 +449,14 @@ function PromptInput() {
               {groupData?.members?.map((member, index) => (
                 <ListItem key={index}>
                   <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: member.uid === auth.currentUser?.uid ? 'primary.main' : 'grey.700' }}>
+                    <Avatar 
+                      src={member.photoURL} 
+                      sx={{ 
+                        bgcolor: member.uid === auth.currentUser?.uid ? 'primary.main' : 'grey.700',
+                        width: 40,
+                        height: 40
+                      }}
+                    >
                       <PersonIcon />
                     </Avatar>
                   </ListItemAvatar>

@@ -1,5 +1,6 @@
 const mockRecommendationData = {
   message: "Taking into account all of your preferences, the following activities are suggested:",
+  date: "Monday 6PM Onwards",
   activities: [
     {
       title: "Star Wars: Episode III - Revenge of the Sith (20th Anniversary)",

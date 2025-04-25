@@ -219,12 +219,25 @@ function Recommendations() {
                   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                 }}
               >
-                <Typography variant="h4" gutterBottom sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem' },
-                  mb: 2
-                }}>
-                  Top Recommendations
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Typography variant="h4" sx={{ 
+                    fontSize: { xs: '1.5rem', sm: '2rem' }
+                  }}>
+                    Top Recommendations
+                  </Typography>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      color: 'primary.main',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1
+                    }}
+                  >
+                    <CalendarIcon fontSize="small" />
+                    {mockRecommendationData.date}
+                  </Typography>
+                </Box>
                 <Typography variant="body1" color="textSecondary" paragraph sx={{ mb: 3 }}>
                   {mockRecommendationData.message}
                 </Typography>
@@ -395,7 +408,14 @@ function Recommendations() {
                     <React.Fragment key={index}>
                       <ListItem alignItems="flex-start">
                         <ListItemAvatar>
-                          <Avatar sx={{ bgcolor: member.uid === auth.currentUser?.uid ? 'primary.main' : 'grey.700' }}>
+                          <Avatar 
+                            src={member.photoURL}
+                            sx={{ 
+                              bgcolor: member.uid === auth.currentUser?.uid ? 'primary.main' : 'grey.700',
+                              width: 40,
+                              height: 40
+                            }}
+                          >
                             <PersonIcon />
                           </Avatar>
                         </ListItemAvatar>
