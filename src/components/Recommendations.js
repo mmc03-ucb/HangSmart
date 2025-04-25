@@ -40,6 +40,7 @@ import {
 import { auth, db } from '../firebase/config';
 import { doc, onSnapshot } from 'firebase/firestore';
 import mockRecommendationData from '../mockbackend';
+import PlaceDetails from './PlaceDetails';
 
 // Create a responsive dark theme
 const darkTheme = createTheme({
@@ -370,6 +371,16 @@ function Recommendations() {
                         Learn More
                       </Button>
                     </CardActions>
+                  )}
+                  {activity.title.includes("Star Wars") && (
+                    <Box sx={{ p: 2 }}>
+                      <PlaceDetails placeId="ChIJcawkWTyuEmsRHdzQ6c68aMw" />
+                    </Box>
+                  )}
+                  {activity.title.includes("Fat Thaigar") && (
+                    <Box sx={{ p: 2 }}>
+                      <PlaceDetails placeId="ChIJiUWOn5yvEmsRGTtwVQxloTk" />
+                    </Box>
                   )}
                 </Card>
               ))}
