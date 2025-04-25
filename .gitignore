@@ -82,3 +82,5 @@ public/static/
 # Firebase Config (Sensitive Information)
 src/firebase/config.js
 config.js
+
+mockbackend.js
