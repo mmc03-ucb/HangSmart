@@ -105,6 +105,7 @@ function PromptInput() {
   const [interests, setInterests] = useState('');
   const [availability, setAvailability] = useState('');
   const [specialRequests, setSpecialRequests] = useState('');
+  const [location, setLocation] = useState('');
   const [saving, setSaving] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -129,6 +130,7 @@ function PromptInput() {
               setInterests(currentMember.preferences.interests || '');
               setAvailability(currentMember.preferences.availability || '');
               setSpecialRequests(currentMember.preferences.specialRequests || '');
+              setLocation(currentMember.preferences.location || '');
             }
 
             // Check if all users have provided preferences and there are at least 2 users
@@ -185,6 +187,7 @@ function PromptInput() {
             interests,
             availability,
             specialRequests,
+            location,
             updatedAt: new Date()
           }
         };
@@ -375,6 +378,17 @@ function PromptInput() {
                 onChange={(e) => setSpecialRequests(e.target.value)}
                 placeholder="I prefer outdoor activities, need wheelchair access..."
                 helperText="Tell us about any preferences or requirements for your activities"
+              />
+
+              {/* Location Input */}
+              <TextField
+                label="Where are you located?"
+                fullWidth
+                variant="outlined"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Enter your city or neighborhood..."
+                helperText="This helps us find activities near you"
               />
 
               <Button 

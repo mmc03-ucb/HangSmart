@@ -27,7 +27,8 @@ import {
   ArrowBack as ArrowBackIcon,
   CalendarMonth as CalendarIcon,
   Interests as InterestsIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  LocationOn as LocationIcon
 } from '@mui/icons-material';
 import { auth, db } from '../firebase/config';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -234,6 +235,20 @@ function Recommendations() {
                               />
                               <Typography variant="body2" sx={{ ml: 1 }}>
                                 {member.preferences.interests}
+                              </Typography>
+                            </Box>
+                          )}
+                          
+                          {member.preferences?.location && (
+                            <Box>
+                              <Chip
+                                icon={<LocationIcon />}
+                                label="Location"
+                                size="small"
+                                sx={{ mb: 1 }}
+                              />
+                              <Typography variant="body2" sx={{ ml: 1 }}>
+                                {member.preferences.location}
                               </Typography>
                             </Box>
                           )}
