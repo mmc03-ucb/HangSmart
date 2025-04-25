@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
+import PropTypes from 'prop-types';
 import config from '../config';
 
 function PlaceDetails({ placeId }) {
@@ -23,5 +24,9 @@ function PlaceDetails({ placeId }) {
     </Box>
   );
 }
+
+PlaceDetails.propTypes = {
+  placeId: PropTypes.string.isRequired
+};
 
 export default PlaceDetails; 

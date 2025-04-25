@@ -110,6 +110,7 @@ function PromptInput() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [recommendationsReady, setRecommendationsReady] = useState(false);
   
   const navigate = useNavigate();
   const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
@@ -137,9 +138,7 @@ function PromptInput() {
             const allUsersHavePreferences = data.members.every(member => member.preferences);
             const hasEnoughUsers = data.members.length >= 2;
 
-            if (allUsersHavePreferences && hasEnoughUsers) {
-              navigate(`/recommendations/${groupId}`);
-            }
+            setRecommendationsReady(allUsersHavePreferences && hasEnoughUsers);
           }
           
           setLoading(false);
@@ -407,6 +406,27 @@ function PromptInput() {
               >
                 {saving ? 'Saving...' : 'Save Preferences'}
               </Button>
+
+              {recommendationsReady && (
+                <Button 
+                  variant="contained" 
+                  color="secondary" 
+                  size="large"
+                  onClick={() => navigate(`/recommendations/${groupId}`)}
+                  sx={{ 
+                    mt: 2,
+                    alignSelf: 'flex-end',
+                    borderRadius: '28px',
+                    px: 3,
+                    background: 'linear-gradient(45deg, #f48fb1 30%, #f06292 90%)',
+                    '&:hover': {
+                      background: 'linear-gradient(45deg, #f06292 30%, #ec407a 90%)',
+                    }
+                  }}
+                >
+                  View Recommendations
+                </Button>
+              )}
             </Stack>
           </Paper>
 
