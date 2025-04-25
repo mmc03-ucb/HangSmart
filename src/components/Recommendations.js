@@ -20,7 +20,12 @@ import {
   createTheme,
   Divider,
   Stack,
-  Chip
+  Chip,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Link
 } from '@mui/material';
 import { 
   Person as PersonIcon, 
@@ -28,10 +33,13 @@ import {
   CalendarMonth as CalendarIcon,
   Interests as InterestsIcon,
   Info as InfoIcon,
-  LocationOn as LocationIcon
+  LocationOn as LocationIcon,
+  Star as StarIcon,
+  OpenInNew as OpenInNewIcon
 } from '@mui/icons-material';
 import { auth, db } from '../firebase/config';
 import { doc, onSnapshot } from 'firebase/firestore';
+import mockRecommendationData from '../mockbackend';
 
 // Create a responsive dark theme
 const darkTheme = createTheme({
@@ -294,6 +302,127 @@ function Recommendations() {
                 </React.Fragment>
               ))}
             </List>
+          </Paper>
+
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              p: { xs: 2, sm: 3 }, 
+              mb: 3,
+              borderRadius: 2,
+              border: '1px solid rgba(144, 202, 249, 0.2)',
+              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            <Typography variant="h5" gutterBottom>
+              Top Recommendations
+            </Typography>
+            <Typography variant="body2" color="textSecondary" paragraph>
+              {mockRecommendationData.message}
+            </Typography>
+
+            <Stack spacing={2}>
+              {mockRecommendationData.activities.slice(0, 2).map((activity, index) => (
+                <Card 
+                  key={index}
+                  sx={{ 
+                    background: 'rgba(30, 30, 46, 0.5)',
+                    border: '1px solid rgba(144, 202, 249, 0.2)',
+                  }}
+                >
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                      <StarIcon color="primary" sx={{ mr: 1 }} />
+                      <Typography variant="h6" component="div">
+                        {activity.title}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                      {activity.content}
+                    </Typography>
+                    {activity.location && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <LocationIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                        <Typography variant="body2" color="text.secondary">
+                          {activity.location}
+                        </Typography>
+                      </Box>
+                    )}
+                    {activity.requests && (
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <InfoIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                        <Typography variant="body2" color="text.secondary">
+                          {activity.requests}
+                        </Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                  {activity.url && (
+                    <CardActions>
+                      <Button 
+                        size="small" 
+                        component={Link} 
+                        href={activity.url} 
+                        target="_blank"
+                        endIcon={<OpenInNewIcon />}
+                      >
+                        Learn More
+                      </Button>
+                    </CardActions>
+                  )}
+                </Card>
+              ))}
+            </Stack>
+          </Paper>
+
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              p: { xs: 2, sm: 3 }, 
+              borderRadius: 2,
+              border: '1px solid rgba(144, 202, 249, 0.2)',
+              background: 'linear-gradient(145deg, #2d1d63 0%, #1e1e2e 100%)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            <Typography variant="h5" gutterBottom>
+              Other Recommendations
+            </Typography>
+
+            <Stack spacing={2}>
+              {mockRecommendationData.activities.slice(2).map((activity, index) => (
+                <Card 
+                  key={index}
+                  sx={{ 
+                    background: 'rgba(30, 30, 46, 0.5)',
+                    border: '1px solid rgba(144, 202, 249, 0.2)',
+                  }}
+                >
+                  <CardContent>
+                    <Typography variant="h6" component="div" gutterBottom>
+                      {activity.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {activity.content}
+                    </Typography>
+                  </CardContent>
+                  {activity.url && (
+                    <CardActions>
+                      <Button 
+                        size="small" 
+                        component={Link} 
+                        href={activity.url} 
+                        target="_blank"
+                        endIcon={<OpenInNewIcon />}
+                      >
+                        Learn More
+                      </Button>
+                    </CardActions>
+                  )}
+                </Card>
+              ))}
+            </Stack>
           </Paper>
         </Container>
       </Box>
