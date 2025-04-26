@@ -1,7 +1,3 @@
-Here's a clear, concise, and professional README tailored specifically for the HangSmart codebase:
-
----
-
 # HangSmart
 
 **HangSmart** is an intelligent social planning app that brings friends with diverse interests, schedules, and accessibility needs together by recommending common activities everyone can enjoy.
